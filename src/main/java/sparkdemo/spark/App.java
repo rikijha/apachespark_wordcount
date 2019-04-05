@@ -1,7 +1,7 @@
 package sparkdemo.spark;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -14,14 +14,25 @@ public class App
     public static void main( String[] args )
     {
        
-        Logger.getLogger("org").setLevel(Level.ERROR);
-        SparkConf sparkConf=new SparkConf().setAppName("Word Count").setMaster("local");
+        Logger.getLogger("org.apache").setLevel(Level.WARN);
+        SparkConf sparkConf=new SparkConf().setAppName("Word Count").setMaster("local[*]");
         JavaSparkContext context=new JavaSparkContext(sparkConf);
-        JavaRDD<String> lines=context.textFile("C:\\Users\\Dell\\Documents\\workspace-sts-3.9.5.RELEASE\\spark\\data\\hello.txt");
-        JavaRDD<String> words=lines.flatMap(s->Arrays.asList(s.split(" ")));
-        Map<String, Long> counts=words.countByValue();
-        for(Map.Entry<String, Long> entry:counts.entrySet()) {
-        	System.out.println(entry.getKey()+" : "+entry.getValue());
-        }
+       
+        List<Integer> inputData=new ArrayList<>();
+        inputData.add(35);
+        inputData.add(12);
+        inputData.add(90);
+        inputData.add(20);
+        
+        
+        JavaRDD<Integer> myRDD=context.parallelize(inputData);
+        Integer result=myRDD.reduce((v1,v2) -> v1+v2);
+        
+         JavaRDD<Double>  newRDD=myRDD.map(value -> Math.sqrt(value));
+         
+         newRDD.collect().forEach(System.out::println);
+        
+        System.out.println(result);
+        context.close();
     }
 }
